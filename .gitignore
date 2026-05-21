@@ -1,0 +1,10 @@
+.DS_Store
+.build/
+DerivedData/
+*.xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.moved-aside
+*.swp
+*.swo
+Package.resolved
