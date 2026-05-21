@@ -6,7 +6,7 @@ APP_BUNDLE := $(BUILD_DIR)/$(APP_NAME).app
 APP_EXECUTABLE := $(APP_BUNDLE)/Contents/MacOS/$(APP_NAME)
 ARCH := $(shell uname -m)
 
-.PHONY: build run clean
+.PHONY: build run quit clean
 
 build:
 	@mkdir -p $(APP_BUNDLE)/Contents/MacOS $(APP_BUNDLE)/Contents/Resources $(MODULE_CACHE)
@@ -20,6 +20,9 @@ build:
 
 run: build
 	open $(APP_BUNDLE)
+
+quit:
+	osascript -e 'tell application "萌宠陪伴" to quit'
 
 clean:
 	rm -rf .build
