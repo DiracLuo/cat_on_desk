@@ -9,6 +9,7 @@ final class PetScene: SKScene {
     private let stateMachine = PetStateMachine()
     private var lastUpdateTime: TimeInterval?
     private var dockEdge: NSRectEdge = .minY
+    private var isMouseNearby = false
 
     init(size: CGSize, preferences: AppPreferences) {
         self.preferences = preferences
@@ -44,18 +45,60 @@ final class PetScene: SKScene {
         resetPetPositionIfNeeded()
     }
 
+    func setMouseNearby(_ nearby: Bool, at point: CGPoint? = nil) {
+        isMouseNearby = nearby
+        if nearby, let point {
+            petNode.setFacingRight(point.x >= petNode.position.x)
+        }
+        stateMachine.setWatching(nearby, at: lastUpdateTime ?? 0)
+    }
+
+    func handleMouseClick(clickCount: Int) {
+        let time = lastUpdateTime ?? 0
+        if clickCount >= 2 {
+            stateMachine.triggerSleep(at: time)
+        } else {
+            stateMachine.triggerClickReaction(at: time)
+        }
+    }
+
+    func isPointNearPet(_ point: CGPoint) -> Bool {
+        interactionFrame().contains(point)
+    }
+
+    func interactionFrame() -> CGRect {
+        CGRect(
+            x: petNode.position.x - petNode.petSize.width * 0.62,
+            y: petNode.position.y - petNode.petSize.height * 0.62,
+            width: petNode.petSize.width * 1.24,
+            height: petNode.petSize.height * 1.24
+        ).insetBy(dx: -26, dy: -24)
+    }
+
     override func update(_ currentTime: TimeInterval) {
         let deltaTime = min(currentTime - (lastUpdateTime ?? currentTime), 1.0 / 15.0)
         lastUpdateTime = currentTime
 
         stateMachine.update(at: currentTime)
+        if isMouseNearby {
+            stateMachine.setWatching(true, at: currentTime)
+        }
 
         switch stateMachine.state {
         case .walking:
             updateWalking(deltaTime: deltaTime, currentTime: currentTime)
-        case .idle:
+        case .idle, .watching:
             let phase = animationController.idlePhase(at: currentTime)
             petNode.applyIdle(phase: phase)
+        case .sleeping:
+            let phase = animationController.sleepPhase(at: currentTime)
+            petNode.applySleeping(phase: phase)
+        case .stretching:
+            let phase = animationController.stretchPhase(at: currentTime)
+            petNode.applyStretching(phase: phase)
+        case .meowing:
+            let phase = animationController.meowPhase(at: currentTime)
+            petNode.applyMeowing(phase: phase)
         case .paused:
             petNode.applyPaused()
         }

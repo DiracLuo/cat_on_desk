@@ -40,7 +40,7 @@ final class StatusBarController {
         let menu = NSMenu()
         let pauseTitle = preferences.isPaused ? "恢复小猫" : "暂停小猫"
         menu.addItem(NSMenuItem(title: pauseTitle, action: #selector(togglePause), keyEquivalent: ""))
-        menu.addItem(NSMenuItem(title: "重新定位", action: #selector(relocate), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "立即校准 Dock", action: #selector(relocate), keyEquivalent: ""))
         menu.addItem(NSMenuItem(title: "设置...", action: #selector(openPreferences), keyEquivalent: ","))
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "退出萌宠陪伴", action: #selector(quit), keyEquivalent: "q"))

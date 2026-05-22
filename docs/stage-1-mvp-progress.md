@@ -45,7 +45,8 @@ Sources/PetCompanion
 当前菜单项：
 
 - 暂停/恢复小猫。
-- 重新定位。
+- 立即校准 Dock。
+- 设置。
 - 退出萌宠陪伴。
 
 应用通过 `LSUIElement = true` 配置为辅助型菜单栏应用，不作为普通主窗口应用出现。
@@ -78,6 +79,7 @@ Sources/PetCompanion
 
 - 使用 `NSScreen.frame` 和 `NSScreen.visibleFrame` 推断 Dock 边缘。
 - 扫描所有屏幕，优先选择 Dock 占用间隙最大的屏幕，避免多屏时跟随当前活跃副屏。
+- 每 2 秒低频检查 Dock 轨道变化，Dock 换屏或尺寸变化后自动跟随。
 - 优先验证底部 Dock。
 - 初步兼容左侧和右侧 Dock 的窗口轨道方向。
 - 监听屏幕参数变化和 Space 变化后重新定位。
@@ -97,8 +99,15 @@ Sources/PetCompanion
 - 小猫显示在透明 SpriteKit 场景中。
 - 小猫沿 Dock 上方水平移动。
 - 碰到边界后转身。
-- 行走时有身体起伏、腿部摆动、尾巴摆动。
-- idle 时有呼吸和眨眼。
+- 使用 PNG 精灵帧显示猫咪素材。
+- 行走时播放 walk 动画。
+- idle 时播放待机眨眼动画。
+- sleeping 时播放睡觉动画。
+- stretching 时播放伸懒腰动画。
+- meowing 时播放喵喵叫视觉气泡动画。
+- 鼠标靠近小猫时停止移动并看向用户。
+- 鼠标单击小猫时随机触发喵喵叫或伸懒腰。
+- 鼠标双击小猫时立即睡觉。
 - paused 时停止移动和动画。
 
 ### 2.7 产品化基础

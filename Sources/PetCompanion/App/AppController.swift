@@ -23,15 +23,18 @@ final class AppController {
             self?.petWindowController.preferencesDidChange()
         }
     )
+    private var dockFollowTimer: Timer?
 
     func start() {
         statusBarController.install()
         petWindowController.show()
         petWindowController.setPaused(preferences.isPaused)
         screenObserver.start()
+        startDockFollowTimer()
     }
 
     func stop() {
+        stopDockFollowTimer()
         screenObserver.stop()
         petWindowController.close()
         statusBarController.uninstall()
@@ -44,10 +47,23 @@ final class AppController {
     }
 
     private func relocatePetWindow() {
-        petWindowController.reposition()
+        petWindowController.reposition(force: true)
     }
 
     private func openPreferences() {
         preferencesWindowController.show()
+    }
+
+    private func startDockFollowTimer() {
+        dockFollowTimer?.invalidate()
+        dockFollowTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] _ in
+            self?.petWindowController.repositionIfNeeded()
+        }
+        dockFollowTimer?.tolerance = 0.6
+    }
+
+    private func stopDockFollowTimer() {
+        dockFollowTimer?.invalidate()
+        dockFollowTimer = nil
     }
 }
