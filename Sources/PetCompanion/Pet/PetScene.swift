@@ -39,6 +39,11 @@ final class PetScene: SKScene {
         }
     }
 
+    func refreshPreferences() {
+        petNode.setDisplayScale(CGFloat(preferences.petScale))
+        resetPetPositionIfNeeded()
+    }
+
     override func update(_ currentTime: TimeInterval) {
         let deltaTime = min(currentTime - (lastUpdateTime ?? currentTime), 1.0 / 15.0)
         lastUpdateTime = currentTime
@@ -74,14 +79,11 @@ final class PetScene: SKScene {
             return
         }
 
-        let clampedX = min(max(petNode.position.x, petNode.petSize.width * 0.55), size.width - petNode.petSize.width * 0.55)
-        let clampedY = min(max(petNode.position.y, petNode.petSize.height * 0.55), size.height - petNode.petSize.height * 0.55)
-
-        if dockEdge == .minY {
-            petNode.position = CGPoint(x: clampedX, y: 42)
-        } else {
-            petNode.position = CGPoint(x: petNode.position.x, y: clampedY)
-        }
+        petNode.position = movementController.dockAlignedPosition(
+            currentPosition: petNode.position,
+            sceneSize: size,
+            petSize: petNode.petSize
+        )
     }
 
     private func resetPetPosition() {

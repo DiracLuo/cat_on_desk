@@ -77,6 +77,7 @@ Sources/PetCompanion
 定位方式：
 
 - 使用 `NSScreen.frame` 和 `NSScreen.visibleFrame` 推断 Dock 边缘。
+- 扫描所有屏幕，优先选择 Dock 占用间隙最大的屏幕，避免多屏时跟随当前活跃副屏。
 - 优先验证底部 Dock。
 - 初步兼容左侧和右侧 Dock 的窗口轨道方向。
 - 监听屏幕参数变化和 Space 变化后重新定位。
@@ -99,6 +100,20 @@ Sources/PetCompanion
 - 行走时有身体起伏、腿部摆动、尾巴摆动。
 - idle 时有呼吸和眨眼。
 - paused 时停止移动和动画。
+
+### 2.7 产品化基础
+
+已新增设置窗口：
+
+- 移动速度。
+- 小猫大小。
+- 是否在全屏空间显示小猫。
+- 开机自动启动。
+
+已新增产品化文档：
+
+- `docs/productization-roadmap.md`
+- `docs/windows-pre-research.md`
 
 ### 2.6 偏好存储
 
@@ -150,6 +165,12 @@ Makefile 会：
 - 编译 Swift 源码。
 - 链接 AppKit 和 SpriteKit。
 - 拷贝 `Resources/Info.plist`。
+
+也提供更直观的启动方式：
+
+- `make reveal`：在 Finder 中定位 `.app`。
+- `make install-user`：安装到 `~/Applications/萌宠陪伴.app`。
+- `make run-installed`：安装后启动。
 
 ## 4. 运行验证记录
 

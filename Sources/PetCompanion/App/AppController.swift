@@ -14,7 +14,14 @@ final class AppController {
         preferences: preferences,
         onTogglePause: { [weak self] in self?.togglePause() },
         onRelocate: { [weak self] in self?.relocatePetWindow() },
+        onOpenPreferences: { [weak self] in self?.openPreferences() },
         onQuit: { NSApp.terminate(nil) }
+    )
+    private lazy var preferencesWindowController = PreferencesWindowController(
+        preferences: preferences,
+        onChange: { [weak self] in
+            self?.petWindowController.preferencesDidChange()
+        }
     )
 
     func start() {
@@ -38,5 +45,9 @@ final class AppController {
 
     private func relocatePetWindow() {
         petWindowController.reposition()
+    }
+
+    private func openPreferences() {
+        preferencesWindowController.show()
     }
 }

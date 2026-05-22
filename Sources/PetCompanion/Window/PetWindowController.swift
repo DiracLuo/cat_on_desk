@@ -34,6 +34,7 @@ final class PetWindowController {
 
         skView.presentScene(petScene)
         overlayWindow.contentView = skView
+        applyWindowBehavior(to: overlayWindow)
         overlayWindow.orderFrontRegardless()
 
         window = overlayWindow
@@ -62,9 +63,27 @@ final class PetWindowController {
         }
         scene?.size = layout.windowFrame.size
         scene?.configure(for: layout.dockEdge)
+        if let window {
+            applyWindowBehavior(to: window)
+        }
     }
 
     func setPaused(_ isPaused: Bool) {
         scene?.setPaused(isPaused)
+    }
+
+    func preferencesDidChange() {
+        scene?.refreshPreferences()
+        if let window {
+            applyWindowBehavior(to: window)
+        }
+    }
+
+    private func applyWindowBehavior(to window: PetOverlayWindow) {
+        var behavior: NSWindow.CollectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
+        if preferences.showInFullScreen {
+            behavior.insert(.fullScreenAuxiliary)
+        }
+        window.collectionBehavior = behavior
     }
 }

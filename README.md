@@ -14,6 +14,7 @@
 - 左右移动、边界转身。
 - walking / idle / paused 基础状态机。
 - 菜单栏暂停、恢复、重新定位、退出。
+- 菜单栏设置面板，可调整速度、大小和全屏空间显示。
 - `UserDefaults` 保存暂停状态、速度和尺寸等基础偏好。
 - Makefile 生成 `.app` bundle。
 
@@ -33,6 +34,8 @@ make build
 
 ## 运行
 
+开发时可以直接运行：
+
 ```bash
 make run
 ```
@@ -43,7 +46,25 @@ make run
 .build/local/PetCompanion.app
 ```
 
-应用启动后会以菜单栏工具形式运行，菜单栏图标为猫咪图标。
+应用启动后会以菜单栏工具形式运行，菜单栏图标为猫咪图标。点击菜单栏猫咪图标可以打开设置、暂停、重新定位或退出。
+
+也可以打开构建产物所在目录，然后在 Finder 里双击：
+
+```bash
+make reveal
+```
+
+更接近日常使用的方式是安装到当前用户的 Applications 目录：
+
+```bash
+make install-user
+```
+
+之后可以从 Finder、Spotlight 或启动台打开“萌宠陪伴”。也可以一步完成安装并启动：
+
+```bash
+make run-installed
+```
 
 ## 退出
 
@@ -74,6 +95,18 @@ make clean
 
 ```text
 docs/development-plan.md
+```
+
+产品化路线见：
+
+```text
+docs/productization-roadmap.md
+```
+
+Windows 预研见：
+
+```text
+docs/windows-pre-research.md
 ```
 
 阶段验证记录见：
