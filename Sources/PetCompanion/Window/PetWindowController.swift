@@ -33,11 +33,14 @@ final class PetWindowController {
         petScene.scaleMode = .resizeFill
         petScene.backgroundColor = .clear
         petScene.anchorPoint = CGPoint(x: 0, y: 0)
-        petScene.configure(for: layout.dockEdge)
+        petScene.configure(for: layout.dockEdge, dockBaseline: layout.dockBaseline)
 
         skView.presentScene(petScene)
         skView.onMouseDown = { [weak petScene] clickCount in
             petScene?.handleMouseClick(clickCount: clickCount)
+        }
+        skView.onMouseDragged = { [weak petScene] point in
+            petScene?.dragPet(to: point)
         }
         overlayWindow.contentView = skView
         applyWindowBehavior(to: overlayWindow)
@@ -75,7 +78,7 @@ final class PetWindowController {
             skView.frame = NSRect(origin: .zero, size: layout.windowFrame.size)
         }
         scene?.size = layout.windowFrame.size
-        scene?.configure(for: layout.dockEdge)
+        scene?.configure(for: layout.dockEdge, dockBaseline: layout.dockBaseline)
         if let window {
             applyWindowBehavior(to: window)
         }
@@ -143,6 +146,7 @@ final class PetWindowController {
         return currentLayout.dockEdge != layout.dockEdge
             || !currentLayout.screen.frame.isApproximatelyEqual(to: layout.screen.frame)
             || !currentLayout.windowFrame.isApproximatelyEqual(to: layout.windowFrame)
+            || abs(currentLayout.dockBaseline - layout.dockBaseline) > 1
     }
 }
 

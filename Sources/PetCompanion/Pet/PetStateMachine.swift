@@ -3,6 +3,7 @@ import Foundation
 enum PetState {
     case walking
     case idle
+    case looking
     case watching
     case sleeping
     case stretching
@@ -18,6 +19,10 @@ final class PetStateMachine {
 
     var isPaused: Bool {
         state == .paused
+    }
+
+    var isSleeping: Bool {
+        state == .sleeping
     }
 
     func setPaused(_ paused: Bool, at time: TimeInterval) {
@@ -41,6 +46,8 @@ final class PetStateMachine {
             transition(to: .idle, at: time)
         case .idle:
             transition(to: nextIdleTransition(), at: time)
+        case .looking:
+            transition(to: .walking, at: time)
         case .watching:
             nextTransitionAt = .infinity
         case .sleeping, .stretching, .meowing:
@@ -78,18 +85,25 @@ final class PetStateMachine {
             return
         }
 
-        transition(to: .sleeping, at: time)
+        if state == .sleeping {
+            transition(to: .walking, at: time)
+        } else {
+            transition(to: .sleeping, at: time)
+        }
     }
 
     private func nextIdleTransition() -> PetState {
         let roll = Double.random(in: 0...1)
-        if roll < 0.18 {
+        if roll < 0.20 {
+            return .looking
+        }
+        if roll < 0.38 {
             return .sleeping
         }
-        if roll < 0.36 {
+        if roll < 0.56 {
             return .stretching
         }
-        if roll < 0.52 {
+        if roll < 0.72 {
             return .meowing
         }
         return .walking
@@ -101,9 +115,11 @@ final class PetStateMachine {
 
         switch newState {
         case .walking:
-            nextTransitionAt = time + Double.random(in: 6...12)
+            nextTransitionAt = time + Double.random(in: 4...9)
         case .idle:
-            nextTransitionAt = time + Double.random(in: 2...5)
+            nextTransitionAt = time + Double.random(in: 1.5...4)
+        case .looking:
+            nextTransitionAt = time + Double.random(in: 2...4)
         case .watching:
             nextTransitionAt = .infinity
         case .sleeping:

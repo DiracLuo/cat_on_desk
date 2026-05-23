@@ -73,12 +73,9 @@ private func drawCat(action: SpriteAction, frame: Int) -> NSImage {
         eyesClosed = true
         legSwing = 0
     case .stretch:
-        body = CGRect(x: 34, y: 62 - CGFloat(frame), width: 96, height: 38)
-        headCenter = CGPoint(x: 126, y: 73 + CGFloat(frame))
-        headRadius = CGSize(width: 24, height: 22)
-        tailLift = -30 - CGFloat(frame * 2)
-        legSwing = CGFloat(frame * 2)
-        mouthOpen = frame >= 2
+        drawRollFrame(ctx: ctx, frame: frame, body: bodyColor, lightBody: lightBody, outline: outline, stripe: stripe)
+        image.unlockFocus()
+        return image
     case .meow:
         mouthOpen = frame % 2 == 0
         showBubble = frame >= 1
@@ -150,6 +147,99 @@ private func drawLeg(ctx: CGContext, at point: CGPoint, swing: CGFloat, outline:
     ctx.addPath(path)
     ctx.setStrokeColor(outline.cgColor)
     ctx.setLineWidth(2)
+    ctx.strokePath()
+}
+
+private func drawRollFrame(
+    ctx: CGContext,
+    frame: Int,
+    body: NSColor,
+    lightBody: NSColor,
+    outline: NSColor,
+    stripe: NSColor
+) {
+    let bodyRects = [
+        CGRect(x: 39, y: 65, width: 82, height: 42),
+        CGRect(x: 41, y: 72, width: 84, height: 38),
+        CGRect(x: 38, y: 73, width: 86, height: 39),
+        CGRect(x: 42, y: 67, width: 80, height: 40)
+    ]
+    let rotations: [CGFloat] = [-0.15, -0.85, 0.75, 0.18]
+    let headCenters = [
+        CGPoint(x: 116, y: 62),
+        CGPoint(x: 104, y: 96),
+        CGPoint(x: 58, y: 92),
+        CGPoint(x: 111, y: 64)
+    ]
+
+    let bodyRect = bodyRects[min(frame, bodyRects.count - 1)]
+    let rotation = rotations[min(frame, rotations.count - 1)]
+    let headCenter = headCenters[min(frame, headCenters.count - 1)]
+    let center = CGPoint(x: bodyRect.midX, y: bodyRect.midY)
+
+    ctx.saveGState()
+    ctx.translateBy(x: center.x, y: center.y)
+    ctx.rotate(by: rotation)
+    let localBody = CGRect(x: -bodyRect.width / 2, y: -bodyRect.height / 2, width: bodyRect.width, height: bodyRect.height)
+    drawBody(ctx: ctx, rect: localBody, fill: body, outline: outline)
+    drawStripes(ctx: ctx, body: localBody, color: stripe)
+    drawRollingPaws(ctx: ctx, body: localBody, outline: outline, frame: frame)
+    ctx.restoreGState()
+
+    drawRollingTail(ctx: ctx, body: bodyRect, outline: outline, fill: body, frame: frame)
+    drawHead(ctx: ctx, center: headCenter, radius: CGSize(width: 22, height: 20), fill: lightBody, outline: outline)
+    drawEars(ctx: ctx, center: headCenter, outline: outline, fill: lightBody)
+    drawFace(ctx: ctx, center: headCenter, eyesClosed: frame != 3, mouthOpen: false, outline: outline)
+}
+
+private func drawRollingPaws(ctx: CGContext, body: CGRect, outline: NSColor, frame: Int) {
+    let pawColor = NSColor(calibratedRed: 0.96, green: 0.58, blue: 0.28, alpha: 1)
+    let points = [
+        CGPoint(x: body.minX + 18, y: body.midY - 25),
+        CGPoint(x: body.minX + 38, y: body.midY - 27),
+        CGPoint(x: body.maxX - 34, y: body.midY + 27),
+        CGPoint(x: body.maxX - 14, y: body.midY + 23)
+    ]
+
+    for point in points {
+        let paw = CGRect(x: point.x - 5, y: point.y - 8, width: 10, height: 16)
+        let path = CGPath(roundedRect: paw, cornerWidth: 5, cornerHeight: 5, transform: nil)
+        ctx.addPath(path)
+        ctx.setFillColor(pawColor.cgColor)
+        ctx.fillPath()
+        ctx.addPath(path)
+        ctx.setStrokeColor(outline.cgColor)
+        ctx.setLineWidth(2)
+        ctx.strokePath()
+    }
+}
+
+private func drawRollingTail(ctx: CGContext, body: CGRect, outline: NSColor, fill: NSColor, frame: Int) {
+    let start = CGPoint(x: body.minX + 10, y: body.midY)
+    let endOffsets = [
+        CGPoint(x: -24, y: -26),
+        CGPoint(x: -18, y: 28),
+        CGPoint(x: -28, y: 10),
+        CGPoint(x: -22, y: -22)
+    ]
+    let end = CGPoint(
+        x: start.x + endOffsets[min(frame, endOffsets.count - 1)].x,
+        y: start.y + endOffsets[min(frame, endOffsets.count - 1)].y
+    )
+
+    let path = CGMutablePath()
+    path.move(to: start)
+    path.addQuadCurve(to: end, control: CGPoint(x: start.x - 28, y: start.y + CGFloat(frame - 1) * 18))
+
+    ctx.addPath(path)
+    ctx.setStrokeColor(outline.cgColor)
+    ctx.setLineWidth(13)
+    ctx.setLineCap(.round)
+    ctx.strokePath()
+
+    ctx.addPath(path)
+    ctx.setStrokeColor(fill.cgColor)
+    ctx.setLineWidth(8)
     ctx.strokePath()
 }
 
@@ -246,15 +336,6 @@ private func drawMeowBubble(ctx: CGContext, frame: Int) {
     ctx.setStrokeColor(NSColor(calibratedWhite: 0.2, alpha: 0.75).cgColor)
     ctx.setLineWidth(2)
     ctx.strokePath()
-
-    let text = NSString(string: frame % 2 == 0 ? "喵" : "喵!")
-    text.draw(
-        at: CGPoint(x: 113, y: 24),
-        withAttributes: [
-            .font: NSFont.boldSystemFont(ofSize: 13),
-            .foregroundColor: NSColor(calibratedWhite: 0.1, alpha: 1)
-        ]
-    )
 }
 
 private func writePNG(_ image: NSImage, to url: URL) throws {

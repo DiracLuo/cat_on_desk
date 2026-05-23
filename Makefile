@@ -6,9 +6,14 @@ SPRITE_SOURCES := $(shell find Resources/CatSprites -name '*.png' 2>/dev/null | 
 APP_BUNDLE := $(BUILD_DIR)/$(APP_NAME).app
 APP_EXECUTABLE := $(APP_BUNDLE)/Contents/MacOS/$(APP_NAME)
 USER_APP_BUNDLE := $(HOME)/Applications/萌宠陪伴.app
+VERSION := 1.0.0
+DIST_DIR := dist/$(VERSION)
+DIST_APP := $(DIST_DIR)/萌宠陪伴.app
+DIST_DMG := $(DIST_DIR)/萌宠陪伴-$(VERSION).dmg
+DIST_ZIP := $(DIST_DIR)/萌宠陪伴-$(VERSION).zip
 ARCH := $(shell uname -m)
 
-.PHONY: assets build run install-user run-installed reveal quit clean
+.PHONY: assets build package run install-user run-installed reveal quit clean
 
 assets:
 	@mkdir -p Resources/CatSprites $(MODULE_CACHE)
@@ -25,6 +30,12 @@ build: assets
 		$(SOURCES)
 	cp Resources/Info.plist $(APP_BUNDLE)/Contents/Info.plist
 	ditto Resources/CatSprites $(APP_BUNDLE)/Contents/Resources/CatSprites
+
+package: build
+	@mkdir -p $(DIST_DIR)
+	ditto $(APP_BUNDLE) $(DIST_APP)
+	ditto -c -k --keepParent $(DIST_APP) $(DIST_ZIP)
+	hdiutil create -volname "萌宠陪伴 $(VERSION)" -srcfolder $(DIST_APP) -ov -format UDZO $(DIST_DMG) || echo "DMG creation skipped; ZIP package is available at $(DIST_ZIP)"
 
 run: build
 	open $(APP_BUNDLE)

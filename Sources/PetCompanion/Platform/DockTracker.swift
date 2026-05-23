@@ -4,11 +4,11 @@ struct DockLayout {
     let screen: NSScreen
     let windowFrame: NSRect
     let dockEdge: NSRectEdge
+    let dockBaseline: CGFloat
 }
 
 final class DockTracker {
-    private let activityHeight: CGFloat = 118
-    private let dockInset: CGFloat = 0
+    private let dockOffset: CGFloat = 13
     private let minimumDockGap: CGFloat = 24
 
     func currentLayout() -> DockLayout? {
@@ -21,8 +21,18 @@ final class DockTracker {
             visibleFrame: candidate.screen.visibleFrame,
             dockEdge: candidate.edge
         )
+        let dockBaseline = makeDockBaseline(
+            screenFrame: candidate.screen.frame,
+            visibleFrame: candidate.screen.visibleFrame,
+            dockEdge: candidate.edge
+        )
 
-        return DockLayout(screen: candidate.screen, windowFrame: windowFrame, dockEdge: candidate.edge)
+        return DockLayout(
+            screen: candidate.screen,
+            windowFrame: windowFrame,
+            dockEdge: candidate.edge,
+            dockBaseline: dockBaseline
+        )
     }
 
     private func bestDockCandidate() -> (screen: NSScreen, edge: NSRectEdge, gap: CGFloat)? {
@@ -83,33 +93,30 @@ final class DockTracker {
     ) -> NSRect {
         switch dockEdge {
         case .minY:
-            return NSRect(
-                x: screenFrame.minX,
-                y: visibleFrame.minY + dockInset,
-                width: screenFrame.width,
-                height: activityHeight
-            )
+            return screenFrame
         case .minX:
-            return NSRect(
-                x: visibleFrame.minX + dockInset,
-                y: screenFrame.minY,
-                width: activityHeight,
-                height: screenFrame.height
-            )
+            return screenFrame
         case .maxX:
-            return NSRect(
-                x: visibleFrame.maxX - activityHeight - dockInset,
-                y: screenFrame.minY,
-                width: activityHeight,
-                height: screenFrame.height
-            )
+            return screenFrame
         default:
-            return NSRect(
-                x: screenFrame.minX,
-                y: visibleFrame.minY + dockInset,
-                width: screenFrame.width,
-                height: activityHeight
-            )
+            return screenFrame
+        }
+    }
+
+    private func makeDockBaseline(
+        screenFrame: NSRect,
+        visibleFrame: NSRect,
+        dockEdge: NSRectEdge
+    ) -> CGFloat {
+        switch dockEdge {
+        case .minY:
+            return visibleFrame.minY - screenFrame.minY + dockOffset
+        case .minX:
+            return visibleFrame.minX - screenFrame.minX + dockOffset
+        case .maxX:
+            return visibleFrame.maxX - screenFrame.minX - dockOffset
+        default:
+            return visibleFrame.minY - screenFrame.minY + dockOffset
         }
     }
 }

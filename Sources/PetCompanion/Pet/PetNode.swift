@@ -4,6 +4,7 @@ import SpriteKit
 final class PetNode: SKNode {
     private let visualRoot = SKNode()
     private let spriteNode = SKSpriteNode()
+    private let meowLabel = SKLabelNode(text: "喵！")
     private var baseScale: CGFloat = 1
     private var facingRight = true
     private var currentAnimation: PetAnimation?
@@ -61,8 +62,16 @@ final class PetNode: SKNode {
         removeAllChildren()
         addChild(visualRoot)
         visualRoot.addChild(spriteNode)
+        addChild(meowLabel)
         spriteNode.size = CGSize(width: 160, height: 128)
-        spriteNode.anchorPoint = CGPoint(x: 0.5, y: 0.72)
+        spriteNode.anchorPoint = CGPoint(x: 0.5, y: 0.1)
+        meowLabel.fontName = "PingFangSC-Semibold"
+        meowLabel.fontSize = 14
+        meowLabel.fontColor = NSColor(calibratedWhite: 0.1, alpha: 1)
+        meowLabel.horizontalAlignmentMode = .center
+        meowLabel.verticalAlignmentMode = .center
+        meowLabel.zPosition = 10
+        meowLabel.isHidden = true
         applyFacing()
         applyIdle(phase: 0)
     }
@@ -80,6 +89,7 @@ final class PetNode: SKNode {
             currentAnimation = animation
             currentFrameIndex = index
         }
+        meowLabel.isHidden = animation != .meow
         spriteNode.colorBlendFactor = 0
     }
 
@@ -104,10 +114,13 @@ final class PetNode: SKNode {
         spriteNode.color = color
         spriteNode.colorBlendFactor = 1
         spriteNode.size = CGSize(width: 104, height: 72 + CGFloat(sin(phase * .pi * 2)) * 3)
+        meowLabel.isHidden = animation != .meow
     }
 
     private func applyFacing() {
         visualRoot.xScale = (facingRight ? 1 : -1) * baseScale
         visualRoot.yScale = baseScale
+        meowLabel.position = CGPoint(x: facingRight ? 54 * baseScale : -54 * baseScale, y: 82 * baseScale)
+        meowLabel.setScale(baseScale)
     }
 }

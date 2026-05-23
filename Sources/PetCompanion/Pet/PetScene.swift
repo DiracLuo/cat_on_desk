@@ -27,9 +27,9 @@ final class PetScene: SKScene {
         resetPetPosition()
     }
 
-    func configure(for dockEdge: NSRectEdge) {
+    func configure(for dockEdge: NSRectEdge, dockBaseline: CGFloat) {
         self.dockEdge = dockEdge
-        movementController.configure(for: dockEdge)
+        movementController.configure(for: dockEdge, dockBaseline: dockBaseline)
         resetPetPositionIfNeeded()
     }
 
@@ -87,7 +87,7 @@ final class PetScene: SKScene {
         switch stateMachine.state {
         case .walking:
             updateWalking(deltaTime: deltaTime, currentTime: currentTime)
-        case .idle, .watching:
+        case .idle, .looking, .watching:
             let phase = animationController.idlePhase(at: currentTime)
             petNode.applyIdle(phase: phase)
         case .sleeping:
@@ -131,5 +131,15 @@ final class PetScene: SKScene {
 
     private func resetPetPosition() {
         petNode.position = movementController.startingPosition(in: size, petSize: petNode.petSize)
+    }
+
+    func dragPet(to point: CGPoint) {
+        petNode.position = movementController.setHomePosition(
+            point,
+            sceneSize: size,
+            petSize: petNode.petSize
+        )
+        petNode.setFacingRight(point.x >= petNode.position.x)
+        stateMachine.setWatching(true, at: lastUpdateTime ?? 0)
     }
 }
