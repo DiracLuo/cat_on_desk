@@ -9,7 +9,6 @@ final class PetScene: SKScene {
     private let stateMachine = PetStateMachine()
     private var lastUpdateTime: TimeInterval?
     private var dockEdge: NSRectEdge = .minY
-    private var isMouseNearby = false
 
     init(size: CGSize, preferences: AppPreferences) {
         self.preferences = preferences
@@ -46,7 +45,6 @@ final class PetScene: SKScene {
     }
 
     func setMouseNearby(_ nearby: Bool, at point: CGPoint? = nil) {
-        isMouseNearby = nearby
         if nearby, let point {
             petNode.setFacingRight(point.x >= petNode.position.x)
         }
@@ -80,9 +78,6 @@ final class PetScene: SKScene {
         lastUpdateTime = currentTime
 
         stateMachine.update(at: currentTime)
-        if isMouseNearby {
-            stateMachine.setWatching(true, at: currentTime)
-        }
 
         switch stateMachine.state {
         case .walking:

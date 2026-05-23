@@ -69,20 +69,27 @@ private func drawAppIcon(spriteURL: URL) throws -> NSImage {
     let size = NSSize(width: 1024, height: 1024)
     let image = NSImage(size: size)
     image.lockFocus()
+    defer { image.unlockFocus() }
+
+    guard let graphicsContext = NSGraphicsContext.current else {
+        throw NSError(domain: "GenerateAppIcons", code: 2, userInfo: [
+            NSLocalizedDescriptionKey: "Could not create graphics context for app icon"
+        ])
+    }
 
     NSColor.clear.setFill()
     NSRect(origin: .zero, size: size).fill()
 
     let backgroundRect = NSRect(x: 44, y: 44, width: 936, height: 936)
     let backgroundPath = NSBezierPath(roundedRect: backgroundRect, xRadius: 216, yRadius: 216)
-    NSGraphicsContext.current?.saveGraphicsState()
+    graphicsContext.saveGraphicsState()
     backgroundPath.addClip()
     let gradient = NSGradient(colors: [
         NSColor(calibratedRed: 1.0, green: 0.86, blue: 0.58, alpha: 1),
         NSColor(calibratedRed: 0.96, green: 0.58, blue: 0.36, alpha: 1)
     ])
     gradient?.draw(in: backgroundPath, angle: -90)
-    NSGraphicsContext.current?.restoreGraphicsState()
+    graphicsContext.restoreGraphicsState()
 
     NSColor(calibratedWhite: 1.0, alpha: 0.25).setStroke()
     backgroundPath.lineWidth = 8
@@ -91,16 +98,15 @@ private func drawAppIcon(spriteURL: URL) throws -> NSImage {
     NSColor(calibratedWhite: 0.12, alpha: 0.14).setFill()
     NSBezierPath(ovalIn: NSRect(x: 260, y: 144, width: 504, height: 72)).fill()
 
-    NSGraphicsContext.current?.saveGraphicsState()
+    graphicsContext.saveGraphicsState()
     let shadow = NSShadow()
     shadow.shadowOffset = NSSize(width: 0, height: -10)
     shadow.shadowBlurRadius = 18
     shadow.shadowColor = NSColor(calibratedWhite: 0.08, alpha: 0.24)
     shadow.set()
     cat.draw(in: NSRect(x: 108, y: 208, width: 808, height: 646), from: .zero, operation: .sourceOver, fraction: 1)
-    NSGraphicsContext.current?.restoreGraphicsState()
+    graphicsContext.restoreGraphicsState()
 
-    image.unlockFocus()
     return image
 }
 

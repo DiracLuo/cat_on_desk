@@ -52,6 +52,8 @@ make package
 dist/1.0.0/萌宠陪伴-1.0.0.zip
 ```
 
+`dist/` 是本地构建输出目录，不进入 git 版本控制。正式对外分发时，将 ZIP 和 `SHA256SUMS` 上传到 GitHub Releases 或其他 artifact 存储。
+
 如果当前 macOS 环境允许 `hdiutil` 创建设备映像，也会额外生成：
 
 ```text
@@ -115,6 +117,7 @@ make clean
 - 当前实现没有修改或嵌入 macOS Dock，只是在 Dock 上方显示透明覆盖窗口。
 - 第一版默认 `ignoresMouseEvents = true`，避免影响 Dock 点击。
 - Dock 定位基于 `NSScreen.frame` 和 `NSScreen.visibleFrame` 推断，底部 Dock 是主要验证目标。
+- `Resources/CatSprites/*.png`、`Resources/AppIcon.png`、`Resources/AppIcon.icns` 和 `Windows/PetCompanion.Windows/app.ico` 是当前 1.0 版本化产品资产。生成脚本用于重建这些资产，但中间目录不入库。
 - SwiftPM 的 `Package.swift` 已保留，后续本机 Xcode/CLT 环境修复后可继续使用标准 SwiftPM 工作流。
 
 ## 后续入口

@@ -19,10 +19,14 @@
 
 ## 发布产物
 
+本地执行 `make package` 会生成：
+
 ```text
 dist/1.0.0/萌宠陪伴-1.0.0.zip
 dist/1.0.0/SHA256SUMS
 ```
+
+`dist/` 不进入 git 版本控制。对外发布时应将 ZIP 和 `SHA256SUMS` 上传到 GitHub Releases。
 
 在支持 `hdiutil` 的本机环境中，打包流程也会尝试生成：
 

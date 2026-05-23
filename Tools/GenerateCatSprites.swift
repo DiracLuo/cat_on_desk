@@ -1,5 +1,9 @@
 import AppKit
 
+enum SpriteGenerationError: Error {
+    case missingGraphicsContext
+}
+
 enum SpriteAction: String, CaseIterable {
     case walk
     case idle
@@ -23,20 +27,25 @@ try FileManager.default.createDirectory(at: outputURL, withIntermediateDirectori
 
 for action in SpriteAction.allCases {
     for frame in 0..<action.frameCount {
-        let image = drawCat(action: action, frame: frame)
+        let image = try drawCat(action: action, frame: frame)
         let fileURL = outputURL.appendingPathComponent("\(action.rawValue)_\(String(format: "%02d", frame)).png")
         try writePNG(image, to: fileURL)
     }
 }
 
-private func drawCat(action: SpriteAction, frame: Int) -> NSImage {
+private func drawCat(action: SpriteAction, frame: Int) throws -> NSImage {
     let size = NSSize(width: 160, height: 128)
     let image = NSImage(size: size)
     image.lockFocus()
+    defer { image.unlockFocus() }
+
+    guard let ctx = NSGraphicsContext.current?.cgContext else {
+        throw SpriteGenerationError.missingGraphicsContext
+    }
+
     NSColor.clear.setFill()
     NSRect(origin: .zero, size: size).fill()
 
-    let ctx = NSGraphicsContext.current!.cgContext
     ctx.translateBy(x: 0, y: size.height)
     ctx.scaleBy(x: 1, y: -1)
 
@@ -74,7 +83,6 @@ private func drawCat(action: SpriteAction, frame: Int) -> NSImage {
         legSwing = 0
     case .stretch:
         drawRollFrame(ctx: ctx, frame: frame, body: bodyColor, lightBody: lightBody, outline: outline, stripe: stripe)
-        image.unlockFocus()
         return image
     case .meow:
         mouthOpen = frame % 2 == 0
@@ -104,7 +112,6 @@ private func drawCat(action: SpriteAction, frame: Int) -> NSImage {
         drawMeowBubble(ctx: ctx, frame: frame)
     }
 
-    image.unlockFocus()
     return image
 }
 

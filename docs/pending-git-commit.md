@@ -1,16 +1,15 @@
 # 待提交变更
 
-由于当前 Codex 沙箱仍无法写入 `.git/index.lock`，本轮变更尚未由 Codex 提交到 git。
+当前本地已有待提交变更。建议将构建输出 `dist/` 作为本地发布产物，不再纳入 git。
 
 用户回到电脑后建议执行：
 
 ```bash
 cd /Users/dirac/code/萌宠陪伴
-git add .gitignore Makefile README.md Resources Sources Tools docs dist Windows
-git commit -m "Release 1.0.0 and add Windows version"
-git tag v1.0.0
+git add .gitignore Makefile README.md Resources Sources Tools docs Windows
+git status --short
+git commit -m "Harden 1.0.0 release packaging"
 git push origin main
-git push origin v1.0.0
 ```
 
 本轮主要变更：
@@ -29,9 +28,12 @@ git push origin v1.0.0
 - 增加 macOS 产品化路线文档。
 - 增加 Windows 版本预研文档。
 - 更新版本号到 `1.0.0`。
-- 生成 1.0.0 ZIP 发布包和 SHA256 校验文件。
+- 生成本地 1.0.0 ZIP 发布包和 SHA256 校验文件。
 - 增加 Windows WPF 对应实现。
 - 增加整只小猫暖橙应用图标，并接入 macOS app bundle、Windows exe 和托盘图标。
 - 让 `make package` 自动刷新 ZIP 的 SHA256 校验文件。
 - 移除当前环境无法重新生成的旧 DMG 发布产物，避免误发过期包。
 - 打包时对 macOS `.app` 做 ad-hoc 签名并验证资源 seal。
+- 从 git 索引移除 `dist/`，发布包改走 GitHub Releases 或其他 artifact 存储。
+- 明确猫咪精灵 PNG、AppIcon PNG/ICNS、Windows ICO 是当前版本化产品资产。
+- 记录下一轮工程优化：动作定义单一来源、移动边界去重、依赖注入和轻量测试。

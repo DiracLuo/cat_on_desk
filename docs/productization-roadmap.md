@@ -5,7 +5,7 @@
 当前版本已经进入 `1.0.0` 可试用发布：
 
 - `.app` bundle 构建。
-- DMG/ZIP 发布包。
+- 本地 DMG/ZIP 打包流程。
 - 菜单栏常驻。
 - Dock 跟随定位。
 - Dock 换屏和尺寸变化的自动跟随。
@@ -157,6 +157,14 @@ make install-user
 - 宠物尺寸预设。
 - 恢复默认设置。
 
+### P6. 仓库与发布物分离
+
+当前策略：
+
+- `dist/` 只作为本地构建输出，不进入 git。
+- 1.0 版本化产品资产保留在仓库中，包括猫咪精灵 PNG、AppIcon PNG/ICNS 和 Windows ICO。
+- 对外发布 ZIP、SHA256SUMS、未来 DMG 时，使用 GitHub Releases 或其他 artifact 存储。
+
 ## 4. 体验增强任务
 
 ### E1. 动作状态扩展
@@ -165,7 +173,7 @@ make install-user
 
 1. idle。
 2. sleep。
-3. stretch。
+3. rolling。
 4. meow。
 5. clicked reaction。
 
@@ -174,6 +182,16 @@ make install-user
 - 动作有冷却时间。
 - 喵叫默认低频。
 - 音效默认可关闭。
+
+### E4. 工程优化待办
+
+来自 1.0 发布前审查，下一轮建议优先处理：
+
+- 统一 `PetAnimation` 和素材生成脚本中的动作定义，避免两处维护帧数。
+- 提取 `PetMovementController` 中重复的边界约束逻辑。
+- 评估将 `CatSpriteLibrary` 从全局单例调整为依赖注入。
+- 为状态机和移动边界补充轻量单元测试。
+- 后续准备正式 Bundle Identifier、Developer ID 签名和公证流程。
 
 ### E2. 鼠标互动
 
