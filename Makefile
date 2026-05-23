@@ -18,6 +18,7 @@ ARCH := $(shell uname -m)
 assets:
 	@mkdir -p Resources/CatSprites $(MODULE_CACHE)
 	CLANG_MODULE_CACHE_PATH=$(MODULE_CACHE) swift Tools/GenerateCatSprites.swift Resources/CatSprites
+	CLANG_MODULE_CACHE_PATH=$(MODULE_CACHE) swift Tools/GenerateAppIcons.swift
 
 build: assets
 	@mkdir -p $(APP_BUNDLE)/Contents/MacOS $(APP_BUNDLE)/Contents/Resources $(MODULE_CACHE)
@@ -30,11 +31,14 @@ build: assets
 		$(SOURCES)
 	cp Resources/Info.plist $(APP_BUNDLE)/Contents/Info.plist
 	ditto Resources/CatSprites $(APP_BUNDLE)/Contents/Resources/CatSprites
+	cp Resources/AppIcon.icns $(APP_BUNDLE)/Contents/Resources/AppIcon.icns
 
 package: build
 	@mkdir -p $(DIST_DIR)
 	ditto $(APP_BUNDLE) $(DIST_APP)
+	codesign --force --deep --sign - $(DIST_APP)
 	ditto -c -k --keepParent $(DIST_APP) $(DIST_ZIP)
+	cd $(DIST_DIR) && shasum -a 256 $(notdir $(DIST_ZIP)) > SHA256SUMS
 	hdiutil create -volname "萌宠陪伴 $(VERSION)" -srcfolder $(DIST_APP) -ov -format UDZO $(DIST_DMG) || echo "DMG creation skipped; ZIP package is available at $(DIST_ZIP)"
 
 run: build

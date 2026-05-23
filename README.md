@@ -11,6 +11,7 @@
 - Dock 所在屏幕自动跟随。
 - SpriteKit 透明场景。
 - PNG 精灵帧小猫。
+- 整只小猫暖橙应用图标，已接入 macOS app bundle 和 Windows 工程。
 - 左右移动、边界转身。
 - walking / idle / watching / sleeping / rolling / meowing / paused 状态机。
 - 鼠标靠近后小猫会停下看你。
@@ -134,6 +135,12 @@ Windows 预研见：
 
 ```text
 docs/windows-pre-research.md
+```
+
+Windows 源码实现见：
+
+```text
+Windows/PetCompanion.Windows
 ```
 
 阶段验证记录见：
